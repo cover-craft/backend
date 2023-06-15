@@ -14,4 +14,5 @@ services:
 
 networks:
   covercraft_network:
-    external: true
+    external:
+      name: covercraft_network
