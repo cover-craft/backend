@@ -27,14 +27,12 @@ def making_cover_stable_diffusion_txt2img(txt2img: Txt2img):
 
     model = select_model(txt2img.model)
 
-    generator = [torch.Generator(device="cuda").manual_seed(0) for i in range(txt2img.number_of_imgs)]
+    generator = [torch.Generator().manual_seed(0) for i in range(txt2img.number_of_imgs)]
     txt2img.seeds = [generator[i].seed() for i in range(txt2img.number_of_imgs)]
 
-    pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float16).to(
-        "cuda"
-    )
+    pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float32)#.to("cuda")
     
-    pipe.enable_xformers_memory_efficient_attention()
+    # pipe.enable_xformers_memory_efficient_attention()
 
     with torch.inference_mode():
         imgs = pipe(prompt=txt2img.prompt, negative_prompt=txt2img.negative_prompt, 
@@ -57,7 +55,7 @@ def select_model(model_name):
     elif model_name == "anything":
         model = "andite/anything-v4.0"
     elif model_name == "pastelmix":
-        model = "andite/pastel-mix"
+        model = "JamesFlare/pastel-mix"
     else:
         raise HTTPException(status_code=404, detail="Model not found")
     return model
