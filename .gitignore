@@ -5,6 +5,8 @@
 /user-service/dist
 /user-service/node_modules
 
+.env 
+
 # Logs
 logs
 *.log
