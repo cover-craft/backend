@@ -31,7 +31,7 @@ def making_cover_stable_diffusion_txt2img(txt2img: Txt2img):
     generator = [torch.Generator().manual_seed(0) for i in range(txt2img.number_of_imgs)]
     txt2img.seeds = [generator[i].seed() for i in range(txt2img.number_of_imgs)]
 
-    pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float32)#.to("cuda")
+    pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float32).to("cuda")
 
     prompt = making_prompt(txt2img.prompt)
 

@@ -9,13 +9,17 @@ from .image_generation import Txt2img, making_cover_stable_diffusion_txt2img
 
 from PIL import Image
 
-origins = ["*"]
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://cover-craft.github.io", 
+]
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
