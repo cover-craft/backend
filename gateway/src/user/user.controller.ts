@@ -7,13 +7,26 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import {
+  ClientProxy,
+  ClientProxyFactory,
+  Transport,
+} from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AuthGuard } from 'src/auth.guard';
 
 @Controller('user')
 export class UserController {
-  constructor(@Inject('USER-MICRO') private userClient: ClientProxy) {}
+  userClient: ClientProxy;
+  constructor() {
+    this.userClient = ClientProxyFactory.create({
+      transport: Transport.TCP,
+      options: {
+        host: process.env.USER_SERVICE_HOST || 'localhost',
+        port: parseInt(process.env.USER_SERVICE_PORT) || 20010,
+      },
+    });
+  }
 
   @Post('/signup')
   signUp(@Body() body: string): Observable<number> {
