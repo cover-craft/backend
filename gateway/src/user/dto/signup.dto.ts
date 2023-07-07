@@ -40,8 +40,6 @@ export class UserCredentialsDto {
   phone_number: string;
 
   //TODO: 프로필 사진 url추가
-  // @IsString()
-  // profile_image_url: string;
 
   //TODO: 사용자 구분: bool형 관련 추가
   @IsBooleanString()

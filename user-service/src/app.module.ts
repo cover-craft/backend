@@ -5,15 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from '../config/typeorm.config';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(typeORMConfig),
+    UserModule,
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
     }),
-    UserModule,
+    TypeOrmModule.forRoot(typeORMConfig),
   ],
   controllers: [AppController],
   providers: [AppService],

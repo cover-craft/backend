@@ -1,30 +1,70 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { UserCredentialsDto } from './dto/user-credential.dto';
 import * as bcrypt from 'bcrypt';
+import { User } from './user.entity';
+import { JwtStrategy } from './jwt-strategy';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository)
-    private userRepository: UserRepository,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
 
-  async signUp(userCredentialsDto: UserCredentialsDto): Promise<void> {
-    const { email, password } = userCredentialsDto;
-    const user = await this.userRepository.findOne({
+  async signUp(userCredentialsDto: UserCredentialsDto): Promise<number> {
+    console.log(userCredentialsDto);
+    const {
+      email,
+      password,
+      nickname,
+      phone_number,
+      //TODO: profile_image
+      is_pro,
+      intro,
+    } = //TODO: 프로필 사진 관련
+      userCredentialsDto;
+    const EX_USER = await this.userRepository.findOne({
       where: {
         email,
       },
     });
 
-    if (!user) {
-      throw new UnauthorizedException('signUP failed');
+    if (EX_USER) {
+      throw new UnauthorizedException('이미 가입한 이메일');
     }
-    return this.userRepository.createUser(userCredentialsDto);
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = this.userRepository.create({
+      email: email,
+      password: hashedPassword,
+      nickname: nickname,
+      phone_number: phone_number,
+      profile_image: 'TODO',
+      category: is_pro == 'true' ? 'P' : 'C',
+      intro: intro,
+    });
+
+    try {
+      await this.userRepository.manager.save(user);
+      return user.user_id;
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Existing email');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 
   async signIn(
@@ -38,9 +78,8 @@ export class UserService {
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      // 유저 토큰 생성 ( Secret + Payload )
-      const payload = { email };
-      const accessToken = await this.jwtService.sign(payload);
+      const payload = { user_id: user.user_id };
+      let accessToken = await this.jwtService.sign(payload);
 
       return { accessToken };
     } else {
