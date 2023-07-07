@@ -11,12 +11,6 @@ import { User } from './user.entity';
   imports: [
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'test',
-      signOptions: {
-        expiresIn: process.env.XPIRES_IN || '1h',
-      },
-    }),
   ],
   controllers: [UserController],
   providers: [UserService],

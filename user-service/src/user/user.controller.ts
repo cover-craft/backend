@@ -2,8 +2,7 @@ import { Controller, ValidationPipe } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UserCredentialsDto } from './dto/user-credential.dto';
 import { UserService } from './user.service';
-import { User } from './user.entity';
-import { Observable } from 'rxjs';
+import { UserInfomation } from './response/response.class';
 
 @Controller('user')
 export class UserController {
@@ -22,8 +21,8 @@ export class UserController {
     return this.userService.signIn(userCredentialsDto);
   }
 
-  @MessagePattern({ message: 'test' })
-  test(user: User) {
-    console.log('user', user);
+  @MessagePattern({ cmd: 'userinfo' })
+  getUserInfo(user_id: number): Promise<UserInfomation> {
+    return this.userService.getUserInfo(user_id);
   }
 }

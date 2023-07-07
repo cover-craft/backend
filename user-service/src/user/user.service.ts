@@ -11,7 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { JwtStrategy } from './jwt-strategy';
 import { Repository } from 'typeorm';
-import { SignInSuccess } from './response/response.class';
+import { SignInSuccess, UserInfomation } from './response/response.class';
 
 @Injectable()
 export class UserService {
@@ -87,6 +87,20 @@ export class UserService {
       };
     } else {
       throw new UnauthorizedException('login failed');
+    }
+  }
+
+  async getUserInfo(user_id: number): Promise<UserInfomation> {
+    const NOW_USER = await this.userRepository.findOne({ where: { user_id } });
+    if (NOW_USER) {
+      return {
+        email: NOW_USER.email,
+        nickname: NOW_USER.nickname,
+        phone_number: NOW_USER.phone_number,
+        profile_image_url: NOW_USER.profile_image_url,
+        is_pro: NOW_USER.category == 'P' ? true : false,
+        intro: NOW_USER.intro,
+      };
     }
   }
 }

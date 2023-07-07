@@ -3,3 +3,12 @@ export interface SignInSuccess {
   user_id: number;
   is_pro: boolean;
 }
+
+export interface UserInfomation {
+  email: string;
+  nickname: string;
+  phone_number: string;
+  profile_image_url: string;
+  is_pro: boolean;
+  intro: string;
+}

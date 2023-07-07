@@ -2,13 +2,14 @@ import {
   Body,
   Controller,
   Get,
-  Header,
   Inject,
   Post,
-  ValidationPipe,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -23,10 +24,16 @@ export class UserController {
   }
 
   @Post('/signin')
-  signIn(@Body() body: string): Observable<{ accessToken: string }> {
+  signIn(@Body() body: string): Observable<string> {
     console.log('signin...');
     const message = this.userClient.send({ cmd: 'signin' }, body);
     console.log('message is ', message);
     return message;
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/info')
+  getUserInfo(@Request() req): Observable<string> {
+    return this.userClient.send({ cmd: 'userinfo' }, req.user_id);
   }
 }
