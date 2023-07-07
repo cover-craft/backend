@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { JwtStrategy } from './jwt-strategy';
 import { Repository } from 'typeorm';
+import { SignInSuccess } from './response/response.class';
 
 @Injectable()
 export class UserService {
@@ -27,11 +28,10 @@ export class UserService {
       password,
       nickname,
       phone_number,
-      //TODO: profile_image
+      profile_image_url,
       is_pro,
       intro,
-    } = //TODO: 프로필 사진 관련
-      userCredentialsDto;
+    } = userCredentialsDto;
     const EX_USER = await this.userRepository.findOne({
       where: {
         email,
@@ -50,7 +50,7 @@ export class UserService {
       password: hashedPassword,
       nickname: nickname,
       phone_number: phone_number,
-      profile_image: 'TODO',
+      profile_image_url: profile_image_url,
       category: is_pro == 'true' ? 'P' : 'C',
       intro: intro,
     });
@@ -62,14 +62,13 @@ export class UserService {
       if (error.code === '23505') {
         throw new ConflictException('Existing email');
       } else {
+        console.error('error: ', error);
         throw new InternalServerErrorException();
       }
     }
   }
 
-  async signIn(
-    userCredentialsDto: UserCredentialsDto,
-  ): Promise<{ accessToken: string }> {
+  async signIn(userCredentialsDto: UserCredentialsDto): Promise<SignInSuccess> {
     const { email, password } = userCredentialsDto;
     const user = await this.userRepository.findOne({
       where: {
@@ -79,9 +78,13 @@ export class UserService {
 
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload = { user_id: user.user_id };
-      let accessToken = await this.jwtService.sign(payload);
+      const accessToken = await this.jwtService.sign(payload);
 
-      return { accessToken };
+      return {
+        accessToken: accessToken,
+        user_id: user.user_id,
+        is_pro: user.category == 'P' ? true : false,
+      };
     } else {
       throw new UnauthorizedException('login failed');
     }

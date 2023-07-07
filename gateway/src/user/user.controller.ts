@@ -9,29 +9,23 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { UserCredentialsDto } from './dto/signup.dto';
-import { UserSignInDto } from './dto/signin.dto';
 
 @Controller('user')
 export class UserController {
   constructor(@Inject('USER-MICRO') private userClient: ClientProxy) {}
 
   @Post('/signup')
-  signUp(
-    @Body(ValidationPipe) userCredentialsDto: UserCredentialsDto,
-  ): Observable<number> {
-    console.log('signup...');
-    const message = this.userClient.send({ cmd: 'signup' }, userCredentialsDto);
+  signUp(@Body() body: string): Observable<number> {
+    console.log('signup...: ', body);
+    const message = this.userClient.send({ cmd: 'signup' }, body);
     console.log('message is ', message);
     return message;
   }
 
   @Post('/signin')
-  signIn(
-    @Body(ValidationPipe) signinDto: UserSignInDto,
-  ): Observable<{ accessToken: string }> {
+  signIn(@Body() body: string): Observable<{ accessToken: string }> {
     console.log('signin...');
-    const message = this.userClient.send({ cmd: 'signin' }, signinDto);
+    const message = this.userClient.send({ cmd: 'signin' }, body);
     console.log('message is ', message);
     return message;
   }

@@ -14,9 +14,9 @@ export class UserSignInDto {
   @IsString()
   @MinLength(8)
   @MaxLength(20)
-  //영어랑 숫자만 가능한 유효성 체크
-  @Matches(/^[a-zA-Z0-9]*$/, {
-    message: '비밀번호 오류',
-  })
+  //   //영어랑 숫자만 가능한 유효성 체크
+  //   @Matches(/^[a-zA-Z0-9]*$/, {
+  //     message: '비밀번호 오류',
+  //   })
   password: string;
 }

@@ -23,15 +23,23 @@ export class User extends BaseEntity {
   @Column()
   nickname: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   phone_number: string;
 
-  @Column()
-  profile_image: string;
+  @Column({
+    nullable: true,
+  })
+  profile_image_url: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   category: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   intro: string;
 }

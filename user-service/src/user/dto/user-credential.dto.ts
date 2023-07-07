@@ -20,10 +20,10 @@ export class UserCredentialsDto {
   @IsString()
   @MinLength(8)
   @MaxLength(20)
-  //영어랑 숫자만 가능한 유효성 체크
-  @Matches(/^[a-zA-Z0-9]*$/, {
-    message: '비밀번호 오류',
-  })
+  // //영어랑 숫자만 가능한 유효성 체크
+  // @Matches(/^[a-zA-Z0-9]*$/, {
+  //   message: '비밀번호 오류',
+  // })
   password: string;
 
   @IsString()
@@ -32,16 +32,15 @@ export class UserCredentialsDto {
   nickname: string;
 
   @IsString()
-  @MinLength(11)
-  @MaxLength(11)
-  @Matches(/^01([0|1|6|7|8|9])?([0-9]{3,4})?([0-9]{4})$/, {
-    message: '',
-  })
+  // @MinLength(11)
+  // @MaxLength(11)
+  // @Matches(/^01([0|1|6|7|8|9])?([0-9]{3,4})?([0-9]{4})$/, {
+  //   message: '전화번호 형식을 확인하세요',
+  // })
   phone_number: string;
 
-  //TODO: 프로필 사진 url추가
-  // @IsString()
-  // profile_image_url: string;
+  @IsString()
+  profile_image_url: string;
 
   //TODO: 사용자 구분: bool형 관련 추가
   @IsBooleanString()
