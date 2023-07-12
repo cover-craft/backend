@@ -2,7 +2,14 @@ import { Controller, ValidationPipe } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { UserCredentialsDto } from './dto/user-credential.dto';
 import { UserService } from './user.service';
-import { UserInfomation } from './response/response.class';
+import {
+  UserInfoChangedMessage,
+  UserInfomation,
+} from './response/response.class';
+import {
+  UserInfoChangeDto,
+  UserInfoChangeRequestDto,
+} from './dto/user.change-info.dto';
 
 @Controller('user')
 export class UserController {
@@ -24,5 +31,15 @@ export class UserController {
   @MessagePattern({ cmd: 'userinfo' })
   getUserInfo(user_id: number): Promise<UserInfomation> {
     return this.userService.getUserInfo(user_id);
+  }
+
+  @MessagePattern({ cmd: 'changeuserinfo' })
+  changeUserInfo(
+    userInfoChangeRequestDto: UserInfoChangeRequestDto,
+  ): Promise<UserInfoChangedMessage> {
+    const USER_ID = userInfoChangeRequestDto.user_id;
+    const userInfoChangeDto = userInfoChangeRequestDto.userInfoChangeDto;
+
+    return this.userService.changeUserInfo(USER_ID, userInfoChangeDto);
   }
 }

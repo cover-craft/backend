@@ -12,3 +12,9 @@ export interface UserInfomation {
   is_pro: boolean;
   intro: string;
 }
+
+export interface UserInfoChangedMessage {
+  status_code: number;
+  is_success: Boolean;
+  message: string;
+}

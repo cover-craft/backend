@@ -49,4 +49,16 @@ export class UserController {
   getUserInfo(@Request() req): Observable<string> {
     return this.userClient.send({ cmd: 'userinfo' }, req.user_id);
   }
+
+  @UseGuards(AuthGuard)
+  @Post('/info')
+  changeUserInfo(@Request() req, @Body() body: string): Observable<string> {
+    return this.userClient.send(
+      { cmd: 'changeuserinfo' },
+      {
+        user_id: req.user_id,
+        userInfoChangeDto: body,
+      },
+    );
+  }
 }
