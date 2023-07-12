@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -12,11 +14,14 @@ import { User } from './user.entity';
 import { JwtStrategy } from './jwt-strategy';
 import { Repository } from 'typeorm';
 import {
+  NormalMessage,
   SignInSuccess,
   UserInfoChangedMessage,
   UserInfomation,
 } from './response/response.class';
 import { UserInfoChangeDto } from './dto/user.change-info.dto';
+import { UserPWChangeDto } from './dto/user.change-pw.dto';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
@@ -25,6 +30,17 @@ export class UserService {
     private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
+
+  async findUserById(user_id: number) {
+    const NOW_USER = await this.userRepository.findOne({ where: { user_id } });
+    if (!NOW_USER) {
+      throw new RpcException({
+        status_code: HttpStatus.BAD_REQUEST,
+        message: '해당 유저를 찾을 수 없습니다. ',
+      }); //Bad Request
+    }
+    return NOW_USER;
+  }
 
   async signUp(userCredentialsDto: UserCredentialsDto): Promise<number> {
     console.log(userCredentialsDto);
@@ -44,7 +60,10 @@ export class UserService {
     });
 
     if (EX_USER) {
-      throw new UnauthorizedException('이미 가입한 이메일');
+      throw new RpcException({
+        status_code: HttpStatus.UNAUTHORIZED,
+        message: '이미 가입한 이메일입니다.',
+      });
     }
 
     const salt = await bcrypt.genSalt();
@@ -65,7 +84,10 @@ export class UserService {
       return user.user_id;
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Existing email');
+        throw new RpcException({
+          status_code: HttpStatus.UNAUTHORIZED,
+          message: '이미 가입한 이메일입니다.',
+        });
       } else {
         console.error('error: ', error);
         throw new InternalServerErrorException();
@@ -91,12 +113,15 @@ export class UserService {
         is_pro: user.category == 'P' ? true : false,
       };
     } else {
-      throw new UnauthorizedException('login failed');
+      throw new RpcException({
+        status_code: HttpStatus.UNAUTHORIZED,
+        message: '로그인 실패',
+      });
     }
   }
 
   async getUserInfo(user_id: number): Promise<UserInfomation> {
-    const NOW_USER = await this.userRepository.findOne({ where: { user_id } });
+    const NOW_USER = await this.findUserById(user_id);
     if (NOW_USER) {
       return {
         email: NOW_USER.email,
@@ -113,14 +138,7 @@ export class UserService {
     user_id: number,
     userChangeInfo: UserInfoChangeDto,
   ): Promise<UserInfoChangedMessage> {
-    const NOW_USER = await this.userRepository.findOne({ where: { user_id } });
-    if (!NOW_USER) {
-      return {
-        status_code: 401,
-        is_success: false,
-        message: '해당 회원을 찾기 못했습니다.',
-      };
-    }
+    const NOW_USER = await this.findUserById(user_id);
     NOW_USER.nickname = userChangeInfo.nickname;
     NOW_USER.phone_number = userChangeInfo.phone_number;
     NOW_USER.profile_image_url = userChangeInfo.profile_image_url;
@@ -132,5 +150,38 @@ export class UserService {
       is_success: true,
       message: '회원 정보 수정 완료.',
     };
+  }
+
+  async changeUserPassword(
+    user_id: number,
+    userPWChangeDto: UserPWChangeDto,
+  ): Promise<NormalMessage> {
+    const NOW_USER = await this.findUserById(user_id);
+
+    //구 비번 맞는지 확인(로그인)
+    if (
+      NOW_USER &&
+      (await bcrypt.compare(userPWChangeDto.old_password, NOW_USER.password))
+    ) {
+      //비번 맞음 -> 신 비번 추가
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(
+        userPWChangeDto.new_password,
+        salt,
+      );
+      NOW_USER.password = hashedPassword;
+      await this.userRepository.save(NOW_USER);
+      return {
+        status_code: HttpStatus.OK,
+        is_success: true,
+        message: '비밀번호 수정 완료',
+      };
+    } else {
+      //비번 틀림 -> 안됨 반환
+      throw new RpcException({
+        status_code: HttpStatus.FORBIDDEN,
+        message: '기존 비밀번호가 틀렸습니다.',
+      });
+    }
   }
 }

@@ -61,4 +61,17 @@ export class UserController {
       },
     );
   }
+
+  @UseGuards(AuthGuard)
+  @Post('/password')
+  changeUserPassword(@Request() req, @Body() body: string): Observable<string> {
+    const abc = this.userClient.send(
+      { cmd: 'changeuserpassword' },
+      {
+        user_id: req.user_id,
+        userPWChangeDto: body,
+      },
+    );
+    return abc;
+  }
 }

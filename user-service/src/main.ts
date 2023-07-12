@@ -1,6 +1,7 @@
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { UserExceptionFilter } from './app.filter';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -13,6 +14,8 @@ async function bootstrap() {
       },
     },
   );
+  app.useGlobalFilters(new UserExceptionFilter());
+
   await app.listen();
 }
 bootstrap();

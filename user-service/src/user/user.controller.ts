@@ -10,6 +10,7 @@ import {
   UserInfoChangeDto,
   UserInfoChangeRequestDto,
 } from './dto/user.change-info.dto';
+import { UserPWChangeRequestDto } from './dto/user.change-pw.dto';
 
 @Controller('user')
 export class UserController {
@@ -41,5 +42,15 @@ export class UserController {
     const userInfoChangeDto = userInfoChangeRequestDto.userInfoChangeDto;
 
     return this.userService.changeUserInfo(USER_ID, userInfoChangeDto);
+  }
+
+  @MessagePattern({ cmd: 'changeuserpassword' })
+  changeUserPassword(
+    userPWChangeRequestDto: UserPWChangeRequestDto,
+  ): Promise<UserInfoChangedMessage> {
+    const USER_ID = userPWChangeRequestDto.user_id;
+    const userPWChangeDto = userPWChangeRequestDto.userPWChangeDto;
+
+    return this.userService.changeUserPassword(USER_ID, userPWChangeDto);
   }
 }

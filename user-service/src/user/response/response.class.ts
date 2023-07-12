@@ -18,3 +18,9 @@ export interface UserInfoChangedMessage {
   is_success: Boolean;
   message: string;
 }
+
+export interface NormalMessage {
+  status_code: number;
+  is_success: Boolean;
+  message: string;
+}
