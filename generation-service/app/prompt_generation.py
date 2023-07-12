@@ -1,11 +1,13 @@
 import os 
 import openai
 import re 
+from dotenv import load_dotenv
+import os 
 
-os.environ["OPENAI_API_KEY"] = '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'
+load_dotenv()
 
 def making_prompt(input):
-    openai.api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     msg = "The book cover generation function is based on artificial intelligence models Stable Diffusion and ChatGPT. \n \
         The main functions are as follows. \n \n \

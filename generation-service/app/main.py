@@ -12,7 +12,7 @@ from PIL import Image
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
-    "https://cover-craft.github.io", 
+    "https://cover-craft.github.io/frontend", 
 ]
 
 app = FastAPI()

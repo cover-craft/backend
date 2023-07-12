@@ -5,6 +5,7 @@
 /user-service/dist
 /user-service/node_modules
 
+secret
 .env 
 
 # Logs
