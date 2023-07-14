@@ -1,25 +1,21 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { DataSource } from 'typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { typeORMConfig } from 'config/typeorm.config';
+import { ConfigModule } from '@nestjs/config';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot(typeORMConfig()),
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: {
-        expiresIn: process.env.EPIRES_IN || '1h',
-      },
+      secret: process.env.JWT_SECRET || 'test',
+      signOptions: { expiresIn: '1h' },
     }),
     UserModule,
   ],

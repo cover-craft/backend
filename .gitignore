@@ -2,8 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos
 
 # compiled output
-/user-service/dist
-/user-service/node_modules
+/*/dist
+/*/node_modules
 
 # Logs
 logs
@@ -71,3 +71,6 @@ Temporary Items
 *.icloud
 
 # End of https://www.toptal.com/developers/gitignore/api/macos
+
+# Env
+*/.env*
