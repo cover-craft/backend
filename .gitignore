@@ -5,6 +5,9 @@
 /*/dist
 /*/node_modules
 
+secret
+.env 
+
 # Logs
 logs
 *.log

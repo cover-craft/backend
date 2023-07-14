@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.3'
 
 services:
   user-service:
@@ -6,8 +6,24 @@ services:
       context: ./user-service
       dockerfile: Dockerfile
     container_name: user-service
+    restart: always
     ports:
       - '3000:3000'
+    networks:
+      - covercraft_network
+
+  generation-service:
+    build: 
+      context: ./generation-service
+      dockerfile: Dockerfile
+    container_name: generation-service
+    restart: always
+    volumes:
+      - ./generation-service/app:/code/app
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./secret/.env
     networks:
       - covercraft_network
 
