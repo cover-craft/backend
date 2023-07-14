@@ -11,14 +11,13 @@ from .prompt_generation import making_prompt
 
 import io
 from dotenv import load_dotenv
-import os 
 
 load_dotenv()
 
 class Txt2img(BaseModel):
     # model: Optional[str] 
     prompt: Optional[str] 
-    negative_prompt: Optional[str] = "Bad drawn face, ugly, bad face, mutation, extra limbs, bad drawn mouth, bad mouth, bad eyes, extra eyes, (cartoon, 3d, bad art, poorly drawn), (disfigured, deformed, extra limbs:1.5), (bad hands), (mutated hands and fingers), bad feet, bad face. watermark. NSFW" 
+    negative_prompt: Optional[str] = "Bad drawn face, ugly, bad face, mutation, extra limbs, bad drawn mouth, bad mouth, bad eyes, extra eyes, (cartoon, 3d, bad art, poorly drawn), (disfigured, deformed, extra limbs:1.5), (bad hands), (mutated hands and fingers), bad feet, bad face. watermark." 
     height: Optional[int] = 768
     width: Optional[int] = 512
     scheduler: Optional[str] = 'DPMSolverMultistep'
@@ -68,8 +67,8 @@ def making_cover_stable_diffusion_txt2img(txt2img: Txt2img):
       res = requests.get(image)
       string_img = base64.encodebytes(res.content).decode('ascii')
       txt2img.imgs.append(string_img)
-
-    return txt2img
+        
+      return txt2img
 
 # def select_model(model_name):
 #     if model_name == "stable-diffusion":

@@ -18,8 +18,12 @@ services:
       dockerfile: Dockerfile
     container_name: generation-service
     restart: always
+    volumes:
+      - ./generation-service/app:/code/app
     ports:
       - '8000:8000'
+    env_file:
+      - ./secret/.env
     networks:
       - covercraft_network
 
