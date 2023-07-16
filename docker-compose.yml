@@ -10,9 +10,9 @@ services:
 
   gateway-service:
     build:
-      context: ./user-service
+      context: ./gateway
       dockerfile: Dockerfile
-    container_name: user-service
+    container_name: gateway-service
     restart: always
     ports:
       - '20010:20010'
