@@ -1,6 +1,27 @@
 version: '3.3'
 
 services:
+  reverse-service:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  gateway-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: always
+    ports:
+      - '20010:20010'
+    env_file:
+      - ./secret/.env.gateway
+      - ./secret/.env.user
+    networks:
+      - covercraft_network
+
   user-service:
     build:
       context: ./user-service
@@ -8,7 +29,10 @@ services:
     container_name: user-service
     restart: always
     ports:
-      - '3000:3000'
+      - '1234:1234'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.user
     networks:
       - covercraft_network
 
@@ -24,6 +48,7 @@ services:
       - '8000:8000'
     env_file:
       - ./secret/.env
+      - ./secret/.env.gen
     networks:
       - covercraft_network
 
