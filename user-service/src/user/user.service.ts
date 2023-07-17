@@ -22,6 +22,9 @@ import {
 import { UserInfoChangeDto } from './dto/user.change-info.dto';
 import { UserPWChangeDto } from './dto/user.change-pw.dto';
 import { RpcException } from '@nestjs/microservices';
+import { createClient } from 'redis';
+import { Message } from 'coolsms-node-sdk';
+const coolsms = require('coolsms-node-sdk').default;
 
 @Injectable()
 export class UserService {
@@ -40,6 +43,87 @@ export class UserService {
       }); //Bad Request
     }
     return NOW_USER;
+  }
+
+  async getValueInRedis(key: string) {
+    try {
+      const redisInfo = {
+        socket: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT) || 6379,
+        },
+        username: process.env.REDIS_USERNAME || '',
+        password: process.env.REDIS_PASSWORD || '',
+      };
+      const client = createClient(redisInfo);
+      await client.connect();
+
+      const myValue = await client.get(key);
+      await client.quit();
+
+      return myValue;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async setValueInRedis(key: string, value: string) {
+    try {
+      const redisInfo = {
+        socket: {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT) || 6379,
+        },
+        username: process.env.REDIS_USERNAME || '',
+        password: process.env.REDIS_PASSWORD || '',
+      };
+      const client = createClient(redisInfo);
+      await client.connect();
+
+      await client.set(key, value);
+      await client.quit();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async sendText(phone: string): Promise<Boolean> {
+    // gen random number
+    const randomNumber: string = Math.random().toString().slice(2, 8);
+    console.log('랜덤 번호 생성: ' + randomNumber);
+
+    const messageService = new coolsms(
+      process.env.PHONE_API_KEY,
+      process.env.PHONE_API_SECRET,
+    );
+
+    const messageText: string = '인증번호: ' + randomNumber;
+
+    // 2건 이상의 메시지를 발송할 때는 sendMany, 단일 건 메시지 발송은 sendOne을 이용해야 합니다.
+    messageService
+      .sendMany([
+        {
+          to: phone,
+          from: '01050220898',
+          text: messageText,
+        },
+      ])
+      .then((res) => {
+        console.log(res);
+        this.setValueInRedis(phone, randomNumber);
+        return true;
+      })
+      .catch((err) => {
+        console.error(err);
+        return false;
+      });
+    return false;
+  }
+
+  async confirmPhone(phone: string, requestCode: string): Promise<Boolean> {
+    const serverCode = await this.getValueInRedis(phone);
+    console.log('ser code: ' + serverCode + ' and req code is ' + requestCode);
+    return requestCode == serverCode ? true : false;
   }
 
   async signUp(userCredentialsDto: UserCredentialsDto): Promise<number> {

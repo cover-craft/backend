@@ -28,6 +28,16 @@ export class UserController {
     });
   }
 
+  @Post('/sendcode')
+  sendCode(@Body() body: string): Observable<string> {
+    return this.userClient.send({ cmd: 'sendcode' }, body);
+  }
+
+  @Post('/confirmcode')
+  confirmCode(@Body() body: string): Observable<string> {
+    return this.userClient.send({ cmd: 'confirmcode' }, body);
+  }
+
   @Post('/signup')
   signUp(@Body() body: string): Observable<number> {
     console.log('signup...: ', body);

@@ -11,10 +11,27 @@ import {
   UserInfoChangeRequestDto,
 } from './dto/user.change-info.dto';
 import { UserPWChangeRequestDto } from './dto/user.change-pw.dto';
+import { UserSendCodeDto } from './dto/user.send-code.dto';
+import { UserConfirmCodeDto } from './dto/user.confirm-code.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @MessagePattern({ cmd: 'sendcode' })
+  async sendTxt(userSendCodeDto: UserSendCodeDto): Promise<Boolean> {
+    console.log('send Txt');
+    return await this.userService.sendText(userSendCodeDto.phone_number);
+  }
+
+  @MessagePattern({ cmd: 'confirmcode' })
+  async confirmTxt(userConfirmCodeDto: UserConfirmCodeDto): Promise<Boolean> {
+    console.log('confirm Txt');
+    return await this.userService.confirmPhone(
+      userConfirmCodeDto.phone_number,
+      userConfirmCodeDto.request_code,
+    );
+  }
 
   @MessagePattern({ cmd: 'signup' })
   async signUp(userCredentialsDto: UserCredentialsDto): Promise<number> {
