@@ -1,55 +1,58 @@
 version: '3.3'
 
 services:
-    reverse-service:
-        image: jwilder/nginx-proxy
-        ports:
-            - 80:80
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
+  reverse-service:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 
-    gateway-service:
-        build:
-            context: ./gateway
-            dockerfile: Dockerfile
-        container_name: gateway-service
-        restart: always
-        ports:
-            - '3000:3000'
-        env_file:
-            - ./secret/.env.backend
-        networks:
-            - covercraft_network
+  # gateway-service:
+  #   build:
+  #     context: ./gateway
+  #     dockerfile: Dockerfile
+  #   container_name: gateway-service
+  #   restart: always
+  #   ports:
+  #     - '20010:20010'
+  #   env_file:
+  #     - ./secret/.env.gateway
+  #     - ./secret/.env.user
+  #   networks:
+  #     - covercraft_network
 
-    user-service:
-        build:
-            context: ./user-service
-            dockerfile: Dockerfile
-        container_name: user-service
-        restart: always
-        ports:
-            - '20010:20010'
-        env_file:
-            - ./secret/.env.backend
-        networks:
-            - covercraft_network
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.user
+    networks:
+      - covercraft_network
 
-    generation-service:
-        build:
-            context: ./generation-service
-            dockerfile: Dockerfile
-        container_name: generation-service
-        restart: always
-        volumes:
-            - ./generation-service/app:/code/app
-        ports:
-            - '8000:8000'
-        env_file:
-            - ./secret/.env
-            - ./secret/.env.gen
-        networks:
-            - covercraft_network
+  generation-service:
+    build: 
+      context: ./generation-service
+      dockerfile: Dockerfile
+    container_name: generation-service
+    restart: always
+    volumes:
+      - ./generation-service/app:/code/app
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.gen
+    networks:
+      - covercraft_network
 
 networks:
-    covercraft_network:
-        external: true
+  covercraft_network:
+    external: true
+    
