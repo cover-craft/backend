@@ -32,9 +32,11 @@
     "bcryptjs": "^2.4.3",
     "class-validator": "^0.14.0",
     "config": "^3.3.9",
+    "coolsms-node-sdk": "^2.0.1",
     "mysql2": "^3.4.5",
     "npm-check-updates": "^16.10.13",
     "passport-jwt": "^4.0.1",
+    "redis": "^4.6.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17"

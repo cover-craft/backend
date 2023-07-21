@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DataSource } from 'typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { typeORMConfig } from 'config/typeorm.config';
+import { typeORMConfig } from 'src/config/typeorm.config';
 
 @Module({
   imports: [
