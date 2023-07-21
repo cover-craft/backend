@@ -1,26 +1,30 @@
 version: '3.3'
 
 services:
-  reverse-service:
+  nginx-service:
     image: jwilder/nginx-proxy
     ports:
       - 80:80
+      - 443:443
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./conf.d:/etc/nginx/conf.d
+      - ./certs:/etc/nginx/certs
 
-  # gateway-service:
-  #   build:
-  #     context: ./gateway
-  #     dockerfile: Dockerfile
-  #   container_name: gateway-service
-  #   restart: always
-  #   ports:
-  #     - '20010:20010'
-  #   env_file:
-  #     - ./secret/.env.gateway
-  #     - ./secret/.env.user
-  #   networks:
-  #     - covercraft_network
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    restart: always
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.backend
+      - ./secret/.env.gateway
+    networks:
+      - covercraft_network
 
   user-service:
     build:
@@ -29,9 +33,10 @@ services:
     container_name: user-service
     restart: always
     ports:
-      - '3000:3000'
+      - '20010:20010'
     env_file:
       - ./secret/.env
+      - ./secret/.env.backend
       - ./secret/.env.user
     networks:
       - covercraft_network
