@@ -22,16 +22,16 @@ services:
     networks:
       - covercraft_network
 
-    redis-service:
-      image: redis:alpine
-      command: redis-server --port 6379
-      container_name: redis-service
-      hostname: redis-service
-      labels:
-        - "name=redis"
-        - "mode=standalone"
-      ports:
-        - 6379:6379
+  redis-service:
+    image: redis:alpine
+    command: redis-server --port 6379
+    container_name: redis-service
+    hostname: redis-service
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6379:6379
 
   nginx-service:
     image: jwilder/nginx-proxy
