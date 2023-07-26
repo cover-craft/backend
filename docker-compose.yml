@@ -38,12 +38,12 @@ services:
     restart: always
     ports:
       - 80:80
-      - 443:443
+      # - 443:443
     volumes:
-      - ./nginx/log:/var/log/nginx 
-      - ./nginx/html:/usr/share/nginx/html
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/certs:/etc/nginx/certs
+      # - ./nginx/log:/var/log/nginx 
+      # - ./nginx/html:/usr/share/nginx/html
+      # - ./nginx/conf.d:/etc/nginx/conf.d
+      # - ./nginx/certs:/etc/nginx/certs
       - /var/run/docker.sock:/tmp/docker.sock:ro
 
   gateway-service:
