@@ -1,6 +1,38 @@
 version: '3.3'
 
 services:
+  mysql-service:
+    image: mysql:latest
+    container_name: database
+    restart: always
+    ports:
+      - "3306:3306"
+    environment: 
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: 
+        - Covercraft0531!
+        - TZ=Asia/Seoul
+      command: 
+        - --default-authentication-plugin=mysql_native_password
+        - --character-set-server=utf8mb4
+        - --collation-server=utf8mb4_unicode_ci
+        - --skip-character-set-client-handshake
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+    networks:
+      - covercraft_network
+
+    redis-service:
+      image: redis:alpine
+      command: redis-server --port 6379
+      container_name: redis-service
+      hostname: redis-service
+      labels:
+        - "name=redis"
+        - "mode=standalone"
+      ports:
+        - 6379:6379
+
   nginx-service:
     image: jwilder/nginx-proxy
     restart: always
