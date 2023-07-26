@@ -3,7 +3,7 @@ version: '3.3'
 services:
   mysql-service:
     image: mysql:latest
-    container_name: database
+    container_name: mysql-service
     restart: always
     ports:
       - "3306:3306"
