@@ -77,3 +77,6 @@ Temporary Items
 
 # Env
 */.env*
+
+*.pyc
+__pycache__/
