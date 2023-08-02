@@ -91,6 +91,22 @@ services:
     networks:
       - covercraft_network
 
+  storage-service:
+    build: 
+      context: ./storage-service
+      dockerfile: Dockerfile
+    container_name: storage-service
+    restart: always
+    volumes:
+      - ./storage-service/app:/code/app
+    ports:
+      - '8100:8100'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.s3
+    networks:
+      - covercraft_network
+
 networks:
   covercraft_network:
     external: true

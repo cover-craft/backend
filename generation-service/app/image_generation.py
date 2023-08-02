@@ -38,6 +38,7 @@ def making_cover_stable_diffusion_txt2img(txt2img: Txt2img):
     # pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float32).to("cuda")
 
     prompt = making_prompt(txt2img.prompt)
+    txt2img.prompt = prompt
 
     # pipe.enable_xformers_memory_efficient_attention()
 
