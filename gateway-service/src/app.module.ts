@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { MatchingModule } from './matching/matching.module';
 
 @Global()
 @Module({
@@ -18,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
       signOptions: { expiresIn: '1h' },
     }),
     UserModule,
+    MatchingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

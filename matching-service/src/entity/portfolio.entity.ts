@@ -2,12 +2,11 @@ import {
   BaseEntity,
   Column,
   Entity,
-  JoinTable,
-  ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Image } from './image.entity';
+import { Connection } from './connection.entity';
 
 @Entity()
 @Unique(['user_id'])
@@ -19,9 +18,11 @@ export class Portfolio extends BaseEntity {
   intro_text: string;
 
   @Column()
+  price: number;
+
+  @Column()
   user_id: number;
 
-  @ManyToMany(() => Image)
-  @JoinTable()
-  images: Image[];
+  @OneToMany(() => Connection, (connection) => connection.portfolio)
+  connections: Connection[];
 }

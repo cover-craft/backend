@@ -5,15 +5,18 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Image } from './image.entity';
+import { Portfolio } from './portfolio.entity';
 
 @Entity()
 export class Connection extends BaseEntity {
   @PrimaryGeneratedColumn()
   connection_id: number;
 
-  @ManyToOne(() => Image, (image) => image.connections)
-  image: Image;
+  @ManyToOne(() => Portfolio, (portfolio) => portfolio.connections)
+  portfolio: Portfolio;
+
+  @Column()
+  image_id: number;
 
   @Column({
     nullable: false,
@@ -26,7 +29,9 @@ export class Connection extends BaseEntity {
   @Column()
   request_message: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   request_review: string;
 
   @Column({
