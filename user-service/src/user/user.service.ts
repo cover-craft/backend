@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +15,9 @@ import { User } from './user.entity';
 import { JwtStrategy } from './jwt-strategy';
 import { Repository } from 'typeorm';
 import {
+  AllProUser,
   NormalMessage,
+  ProUserInfo,
   SignInSuccess,
   UserInfoChangedMessage,
   UserInfomation,
@@ -24,6 +27,7 @@ import { UserPWChangeDto } from './dto/user.change-pw.dto';
 import { RpcException } from '@nestjs/microservices';
 import { createClient } from 'redis';
 import { Message } from 'coolsms-node-sdk';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 const coolsms = require('coolsms-node-sdk').default;
 
 @Injectable()
@@ -267,5 +271,95 @@ export class UserService {
         message: '기존 비밀번호가 틀렸습니다.',
       });
     }
+  }
+
+  async checkEmailOK(email: string): Promise<boolean> {
+    const EX_USER = await this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+    if (EX_USER) {
+      return false;
+    }
+    return true;
+  }
+
+  async checkPhoneOK(phone: string): Promise<boolean> {
+    const EX_USER = await this.userRepository.findOne({
+      where: {
+        phone_number: phone,
+      },
+    });
+    if (EX_USER) {
+      return false;
+    }
+    return true;
+  }
+
+  async resetPasswordToPhone(phone: string): Promise<boolean> {
+    const EX_USER = await this.userRepository.findOne({
+      where: {
+        phone_number: phone,
+      },
+    });
+    if (!EX_USER) {
+      throw new NotFoundException({
+        status_code: HttpStatus.BAD_REQUEST,
+        message: '해당 user를 찾을 수 없습니다. ',
+      }); //Bad Request
+    }
+
+    const RANDOM_STRING = Math.floor(Math.random() * 10000000000).toString();
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(RANDOM_STRING, salt);
+    EX_USER.password = hashedPassword;
+    try {
+      await this.userRepository.save(EX_USER);
+    } catch (error) {
+      console.error('error: ', error);
+      throw new InternalServerErrorException();
+    }
+
+    // send txt
+    const messageService = new coolsms(
+      process.env.PHONE_API_KEY,
+      process.env.PHONE_API_SECRET,
+    );
+
+    const messageText: string =
+      '새로운 비밀번호는: ' + RANDOM_STRING + '입니다. ';
+
+    // 2건 이상의 메시지를 발송할 때는 sendMany, 단일 건 메시지 발송은 sendOne을 이용해야 합니다.
+    await messageService.sendMany([
+      {
+        to: phone,
+        from: '01050220898',
+        text: messageText,
+      },
+    ]);
+    return true;
+  }
+
+  async listAllProUser(): Promise<AllProUser> {
+    const ALL_PRO_USERS = await this.userRepository.find({
+      where: { category: 'P' },
+    });
+
+    const ALL_PRO_USER_INFO = Array<ProUserInfo>();
+    let index = 0;
+    for (1; index < ALL_PRO_USERS.length; index++) {
+      const NEW_PRO_USER = ALL_PRO_USERS[index];
+      ALL_PRO_USER_INFO.push({
+        pro_user_id: NEW_PRO_USER.user_id,
+        nickname: NEW_PRO_USER.nickname,
+        profile_image_url: NEW_PRO_USER.profile_image_url,
+        intro: NEW_PRO_USER.intro,
+      });
+    }
+    return {
+      total_number: index,
+      people: ALL_PRO_USER_INFO,
+    };
   }
 }

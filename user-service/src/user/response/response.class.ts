@@ -24,3 +24,15 @@ export interface NormalMessage {
   is_success: Boolean;
   message: string;
 }
+
+export interface AllProUser {
+  total_number: number;
+  people: ProUserInfo[];
+}
+
+export interface ProUserInfo {
+  pro_user_id: number;
+  nickname: string;
+  profile_image_url: string;
+  intro: string;
+}

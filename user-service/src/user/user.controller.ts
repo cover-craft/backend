@@ -3,6 +3,7 @@ import { MessagePattern } from '@nestjs/microservices';
 import { UserCredentialsDto } from './dto/user-credential.dto';
 import { UserService } from './user.service';
 import {
+  AllProUser,
   UserInfoChangedMessage,
   UserInfomation,
 } from './response/response.class';
@@ -69,5 +70,25 @@ export class UserController {
     const userPWChangeDto = userPWChangeRequestDto.userPWChangeDto;
 
     return this.userService.changeUserPassword(USER_ID, userPWChangeDto);
+  }
+
+  @MessagePattern({ cmd: 'checkemailok' })
+  checkEmailOK(email: string): Promise<boolean> {
+    return this.userService.checkEmailOK(email);
+  }
+
+  @MessagePattern({ cmd: 'checkphoneok' })
+  checkPhoneOK(phone: string): Promise<boolean> {
+    return this.userService.checkPhoneOK(phone);
+  }
+
+  @MessagePattern({ cmd: 'resetpassword' })
+  resetPassword(phone: string): Promise<boolean> {
+    return this.userService.resetPasswordToPhone(phone);
+  }
+
+  @MessagePattern({ cmd: 'getallpro' })
+  getAllProUserInfo(): Promise<AllProUser> {
+    return this.userService.listAllProUser();
   }
 }

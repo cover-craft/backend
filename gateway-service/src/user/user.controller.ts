@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   Inject,
   Post,
   Request,
@@ -36,6 +37,16 @@ export class UserController {
   @Post('/confirmcode')
   confirmCode(@Body() body: string): Observable<string> {
     return this.userClient.send({ cmd: 'confirmcode' }, body);
+  }
+
+  @Get('/checkemail')
+  checkEmail(@Headers('email') email: string): Observable<boolean> {
+    return this.userClient.send({ cmd: 'checkemailok' }, email);
+  }
+
+  @Get('/checkphone')
+  checkPhone(@Headers('phone_number') phone: string): Observable<boolean> {
+    return this.userClient.send({ cmd: 'checkphoneok' }, phone);
   }
 
   @Post('/signup')
@@ -83,5 +94,15 @@ export class UserController {
       },
     );
     return abc;
+  }
+
+  @Post('/resetpassword')
+  resetPassword(@Body() body): Observable<boolean> {
+    return this.userClient.send({ cmd: 'resetpassword' }, body.phone_number);
+  }
+
+  @Get('/getallpro')
+  getAllProUserInfo(): Observable<string> {
+    return this.userClient.send({ cmd: 'getallpro' }, {});
   }
 }
