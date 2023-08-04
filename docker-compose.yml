@@ -75,6 +75,21 @@ services:
     networks:
       - covercraft_network
 
+  matching-service:
+    build:
+      context: ./matching-service
+      dockerfile: Dockerfile
+    container_name: matching-service
+    restart: always
+    ports:
+      - '20020:20020'
+    env_file:
+      - ./secret/.env
+      - ./secret/.env.backend
+      - ./secret/.env.matching
+    networks:
+      - covercraft_network
+
   generation-service:
     build: 
       context: ./generation-service
